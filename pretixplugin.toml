@@ -1,0 +1,5 @@
+[plugin]
+package = "pretix-stripe-blik-payment"
+modules = [ "pretix_stripe_blik_payment" ]
+marketplace_name = "stripe-blik-payment"
+

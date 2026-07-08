@@ -1,0 +1,80 @@
+[project]
+name = "pretix-stripe-blik-payment"
+dynamic = ["version"]
+description = "Adds BLIK payment method backed by the built-in Stripe plugin"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+keywords = ["pretix"]
+authors = [
+    {name = "Norbert Dudziak", email = "norbert.dudziak@norxnd.com"},
+]
+maintainers = [
+    {name = "Norbert Dudziak", email = "norbert.dudziak@norxnd.com"},
+]
+
+dependencies = [
+    "pretix>=2026.6.0",
+    "django==5.2.*",
+]
+
+[project.optional-dependencies]
+dev = [
+    "types-reportlab==4.5.1.*",
+    "django-stubs==6.0.*",
+    "mypy==1.10.0",
+    "pyright>=1.1.360",
+    "pytest>=8.0.0",
+    "pytest-django>=4.12.0",
+    "build>=1.5.0",
+    "types-setuptools>=83.0.0.20260706",
+]
+
+[project.entry-points."pretix.plugin"]
+pretix_stripe_blik_payment = "pretix_stripe_blik_payment:PretixPluginMeta"
+
+[project.entry-points."distutils.commands"]
+build = "pretix_plugin_build.build:CustomBuild"
+
+[build-system]
+requires = [
+    "setuptools",
+    "pretix-plugin-build",
+]
+build-backend = "setuptools.build_meta"
+
+[project.urls]
+homepage = "https://github.com/NORXND/pretix-stripe-blik-payment"
+repository = "https://github.com/NORXND/pretix-stripe-blik-payment"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+version = {attr = "pretix_stripe_blik_payment.__version__"}
+
+[tool.setuptools.packages.find]
+include = ["pretix*"]
+namespaces = false
+
+[[tool.mypy.overrides]]
+module = [
+    "isodate.*",
+    "pretix.*",
+    "fontTools.*",
+    "django_scopes.*",
+    "requests",
+]
+ignore_missing_imports = true
+follow_imports = "skip"
+
+[tool.pyright]
+include = ["pretix_stripe_blik_payment"]
+exclude = ["build", ".venv", ".git", "tests", "**/node_modules", "**/__pycache__", "**/.*"]
+typeCheckingMode = "basic"
+reportMissingImports = "none"
+reportMissingModuleSource = "none"
+reportAttributeAccessIssue = "none"
+reportIncompatibleMethodOverride = "none"
+reportIncompatibleVariableOverride = "none"
+reportArgumentType = "none"
+reportAssignmentType = "none"
