@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from decimal import Decimal
+import re
 
 from django import forms
 from django.http import HttpRequest
@@ -8,20 +9,20 @@ from django.utils.translation import gettext_lazy as _
 
 from pretix.base.models import Order, OrderPayment
 from pretix.plugins.stripe.payment import (
+    PaymentException,
     StripeRedirectMethod,
 )
 
 
 class StripeBlik(StripeRedirectMethod):
     identifier = "stripe_blik"
-    verbose_name = _("BLIK via Stripe") # pyright: ignore[reportAssignmentType, reportIncompatibleMethodOverride]
-    public_name = _("BLIK") # pyright: ignore[reportAssignmentType, reportIncompatibleMethodOverride]
+    verbose_name = _("BLIK via Stripe")
+    public_name = _("BLIK")
     method = "blik"
     confirmation_method = "automatic"
     redirect_in_widget_allowed = False
     explanation = _(
-        "BLIK is a mobile payment method popular in Poland. Please open your banking app, generate a 6-digit "
-        "BLIK code and enter it below before it expires."
+        "You will be asked to enter a 6-digit code from your banking app on the confirmation page, right before placing your order."
     )
 
     @property
@@ -30,12 +31,13 @@ class StripeBlik(StripeRedirectMethod):
             "method_blik", as_type=bool
         )
 
-    def is_allowed(self, request: HttpRequest, total: Decimal) -> bool: # pyright: ignore[reportIncompatibleMethodOverride]
+    def is_allowed(self, request, total=None):
         return super().is_allowed(request, total) and self.event.currency == "PLN"
 
+    # Na etapie payment_step nic już nie zbieramy – tylko informacja, że kod poda się na końcu
     def payment_form_render(self, request) -> str:
         template = get_template(
-            "pretixplugins/stripe/checkout_payment_form_simple.html"
+            "pretixplugins/stripe/checkout_payment_form_simple_noform.html"
         )
         return template.render(
             {
@@ -43,58 +45,33 @@ class StripeBlik(StripeRedirectMethod):
                 "event": self.event,
                 "settings": self.settings,
                 "explanation": self.explanation,
-                "form": self.payment_form(request),
             }
         )
 
-    @property
-    def payment_form_fields(self):
-        return OrderedDict(
-            [
-                (
-                    "code",
-                    forms.RegexField(
-                        label=_("BLIK code"),
-                        regex=r"^\d{6}$",
-                        widget=forms.TextInput(
-                            attrs={"inputmode": "numeric", "maxlength": "6"}
-                        ),
-                    ),
-                ),
-            ]
+    def checkout_prepare(self, request, cart):
+        request.session[f"payment_stripe_{self.method}_payment_method_id"] = None
+        return True
+
+    def payment_is_valid_session(self, request):
+        return f"payment_stripe_{self.method}_payment_method_id" in request.session
+
+    # To renderuje się na stronie CONFIRM, w tym samym <form> co przycisk "Złóż zamówienie"
+    def checkout_confirm_render(self, request, **kwargs) -> str:
+        template = get_template(
+            "pretix_stripe_blik_payment/confirm_blik_code_field.html"
         )
-
-    def checkout_prepare(self, request, cart): # pyright: ignore[reportIncompatibleMethodOverride]
-        form = self.payment_form(request)
-        if form.is_valid():
-            request.session[f"payment_stripe_{self.method}_payment_method_id"] = None
-            request.session[f"payment_stripe_{self.method}_code"] = form.cleaned_data[
-                "code"
-            ]
-            return True
-        return False
-
-    def execute_payment(self, request: HttpRequest, payment: OrderPayment):
-        try:
-            return super().execute_payment(request, payment)
-        finally:
-            request.session.pop(f"payment_stripe_{self.method}_code", None)
+        return template.render({"request": request})
 
     def _payment_intent_kwargs(self, request, payment):
+        code = request.POST.get("stripe_blik_code", "")
+        if not re.match(r"^\d{6}$", code):
+            raise PaymentException(_("Please enter a valid 6-digit BLIK code."))
         return {
             "payment_method_data": {
                 "type": "blik",
                 "billing_details": {"email": payment.order.email},
             },
             "payment_method_options": {
-                "blik": {
-                    "code": request.session.get(
-                        f"payment_stripe_{self.method}_code", ""
-                    )
-                },
+                "blik": {"code": code},
             },
         }
-    
-    @property
-    def settings_form_fields(self):
-        return {}

@@ -1,0 +1,54 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.0.2\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-07-09 05:54+0200\n"
+"PO-Revision-Date: 2026-07-09 05:56+0200\n"
+"Last-Translator: Norbert Dudziak <norbert.dudziak@norxnd.com>\n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 || n%100>14) ? 1 : 2);\n"
+
+#: .\pretix_stripe_blik_payment\apps.py:39
+#: .\pretix_stripe_blik_payment\payment.py:20
+msgid "BLIK"
+msgstr "BLIK"
+
+#: .\pretix_stripe_blik_payment\apps.py:42
+msgid ""
+"Some payment methods might need to be enabled in the settings of your Stripe "
+"account before they work properly."
+msgstr ""
+"Niektóre metody płatności mogą wymagać aktywacji w ustawieniach konta Stripe, "
+"aby działały poprawnie."
+
+#: .\pretix_stripe_blik_payment\payment.py:19
+msgid "BLIK via Stripe"
+msgstr "BLIK przez Stripe"
+
+#: .\pretix_stripe_blik_payment\payment.py:25
+msgid ""
+"You will be asked to enter a 6-digit code from your banking app on the "
+"confirmation page, right before placing your order."
+msgstr ""
+"Na stronie potwierdzenia, tuż przed złożeniem zamówienia, zostaniesz poproszony "
+"o wpisanie 6-cyfrowego kodu ze swojej aplikacji bankowej."
+
+#: .\pretix_stripe_blik_payment\payment.py:66
+msgid "Please enter a valid 6-digit BLIK code."
+msgstr "Proszę wprowadzić poprawny 6-cyfrowy kod BLIK."
+
+#: .\pretix_stripe_blik_payment\templates\pretix_stripe_blik_payment\confirm_code_field.html:3
+msgid "BLIK code"
+msgstr "Kod BLIK"
+
+#: .\pretix_stripe_blik_payment\templates\pretix_stripe_blik_payment\confirm_code_field.html:8
+msgid "Open your banking app and generate a BLIK code."
+msgstr "Otwórz swoją aplikację bankową i wygeneruj kod BLIK."

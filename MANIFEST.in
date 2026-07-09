@@ -1,1 +1,3 @@
+recursive-include pretix_stripe_blik_payment/templates *
+recursive-include pretix_stripe_blik_payment/locale *
 include LICENSE
