@@ -62,7 +62,9 @@ class StripeBlik(StripeRedirectMethod):
         return None  # brak redirectu – user zobaczy zwykłą stronę zamówienia
 
     def payment_pending_render(self, request, payment: OrderPayment) -> str:
-        template = get_template("pretixplugins/stripe_blik/pending_code_form.html")
+        template = get_template(
+            "pretix_stripe_blik_payment/pending_blik_code_form.html"
+        )
         return template.render(
             {
                 "request": request,
