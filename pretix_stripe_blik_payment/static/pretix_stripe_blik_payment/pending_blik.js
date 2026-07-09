@@ -34,12 +34,15 @@
                     showFailed();
                     return;
                 }
+                if (data.status === "processing") {
+                    showWaiting();
+                }
+
                 pollTimer = setTimeout(poll, pollIntervalMs);
             })
             .catch(function () {
                 pollTimer = setTimeout(poll, pollIntervalMs);
             });
     }
-
     poll();
 })();

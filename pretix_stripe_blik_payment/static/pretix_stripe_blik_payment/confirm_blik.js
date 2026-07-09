@@ -1,9 +1,11 @@
 (function () {
-    var form = document.getElementById("id_stripe_blik_code").closest("form");
     var root = document.getElementById("blik-confirm");
+    var form = root.closest("form");
     var stashUrl = root.dataset.stashUrl;
 
     form.addEventListener("submit", function (ev) {
+        ev.preventDefault();
+        
         var input = document.getElementById("id_stripe_blik_code");
         if (!/^\d{6}$/.test(input.value)) {
             return; // niech HTML5 walidacja/required pokaże błąd
@@ -13,8 +15,6 @@
         if (form.dataset.blikStashed === input.value) {
             return;
         }
-
-        ev.preventDefault();
 
         var fd = new FormData();
         fd.append("code", input.value);
