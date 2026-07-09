@@ -23,7 +23,7 @@ class StripeBlik(StripeRedirectMethod):
     confirmation_method = "automatic"
     redirect_in_widget_allowed = False
     explanation = _(
-        "You will be asked to enter a 6-digit code from your banking app on the confirmation page, right before placing your order."
+        "You will be able to pay after placing an order."
     )
 
     @property
@@ -80,5 +80,6 @@ class StripeBlik(StripeRedirectMethod):
                         "hash": payment.order.tagged_secret("plugins:stripe_blik"),
                     },
                 ),
-            }
+            },
+            request=request,
         )
