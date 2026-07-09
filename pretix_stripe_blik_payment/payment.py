@@ -250,7 +250,11 @@ class StripeBlik(StripeRedirectMethod):
         intent = stripe.PaymentIntent.retrieve(
             intent_id,
             api_key=self.settings.get("secret_key"),
+            expand=["latest_charge"],
         )
+
+        payment.info = str(intent)
+        payment.save(update_fields=["info"])
 
         if intent.status == "succeeded":
             if payment.state != OrderPayment.PAYMENT_STATE_CONFIRMED:
@@ -267,6 +271,7 @@ class StripeBlik(StripeRedirectMethod):
             return "failed"
 
         return "processing"
+
 
     def retry_with_new_code(self, payment: OrderPayment, code: str):
         intent_id = self._stripe_intent_id(payment)
@@ -292,5 +297,10 @@ class StripeBlik(StripeRedirectMethod):
             api_key=api_key,
             payment_method_data={"type": "blik"},
             payment_method_options={"blik": {"code": code}},
+            expand=["latest_charge"],
         )
+
+        payment.info = str(intent)
+        payment.save(update_fields=["info"])
+
         return intent.status

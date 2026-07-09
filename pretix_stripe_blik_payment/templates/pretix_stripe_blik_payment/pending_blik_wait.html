@@ -1,8 +1,11 @@
 {% load i18n %}
 {% load static %}
 <div id="blik-pending" data-status-url="{{ status_url }}" data-retry-url="{{ retry_url }}">
+    <div id="blik-loading" class="alert alert-danger">
+        <p>{% trans "Poczekaj aż zbierzemy informacje o Twojej płatności." %}</p>
+    </div>
 
-    <div id="blik-waiting" class="text-center">
+    <div id="blik-waiting" style="display:none;" class="text-center">
         <div class="loading-spinner"></div>
         <p>{% trans "Otwórz aplikację swojego banku i zaakceptuj płatność BLIK." %}</p>
         <p class="text-muted">{% trans "To okno odświeży się automatycznie." %}</p>
