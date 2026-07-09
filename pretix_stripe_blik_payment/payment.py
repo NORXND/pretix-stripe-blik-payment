@@ -71,7 +71,7 @@ class StripeBlik(StripeRedirectMethod):
                 "event": self.event,
                 "payment": payment,
                 "action_url": reverse(
-                    "plugins:pretix_stripe_blik:pay",
+                    "plugins:pretix_stripe_blik_payment:pay",
                     kwargs={
                         "organizer": self.event.organizer.slug,
                         "event": self.event.slug,
