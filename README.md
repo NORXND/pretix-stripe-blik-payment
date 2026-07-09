@@ -1,5 +1,7 @@
 # pretix Furbadge Plugin
 
+**WARNING: This is a purely testing repository for internal usage !!!**
+
 A Pretix plugin that adds BLIK as Payment Method for built-in Stripe plugin.
 
 ## Development

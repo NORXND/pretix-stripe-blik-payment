@@ -55,11 +55,22 @@ class StripeBlik(StripeRedirectMethod):
     def payment_is_valid_session(self, request):
         return f"payment_stripe_{self.method}_payment_method_id" in request.session
 
-    # KLUCZOWE: przy tworzeniu zamówienia NIC nie robimy ze Stripe.
     def execute_payment(self, request, payment: OrderPayment):
         payment.state = OrderPayment.PAYMENT_STATE_CREATED
         payment.save()
-        return None  # brak redirectu – user zobaczy zwykłą stronę zamówienia
+        return None
+
+
+    def _payment_intent_kwargs(self, request, payment):
+        kwargs = super()._payment_intent_kwargs(request, payment)
+
+        kwargs["payment_method_options"] = {
+            "blik": {
+                "code": request.POST["code"],
+            }
+        }
+
+        return kwargs
 
     def payment_pending_render(self, request, payment: OrderPayment) -> str:
         template = get_template(

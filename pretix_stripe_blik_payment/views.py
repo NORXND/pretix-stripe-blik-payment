@@ -14,18 +14,6 @@ class BlikPayView(EventViewMixin, View):
         order = get_object_or_404(Order, code=kwargs["order"], event=request.event)
         payment = get_object_or_404(OrderPayment, pk=kwargs["payment"], order=order)
 
-        if payment.order.tagged_secret("plugins:stripe_blik") != kwargs["hash"]:
-            messages.error(request, _("Invalid link."))
-            return HttpResponseRedirect(order.get_absolute_url())
-
-        code = request.POST.get("code", "")
         provider = payment.payment_provider
 
-        provider._init_api()
-
-        request.session[f"_blik_code_{payment.pk}"] = (
-            code
-        )
-        provider._handle_payment_intent(request, payment)
-
-        return HttpResponseRedirect(order.get_absolute_url())
+        return provider._handle_payment_intent(request, payment)
