@@ -2,6 +2,8 @@
     var root = document.getElementById("blik-confirm");
     var form = root.closest("form");
     var stashUrl = root.dataset.stashUrl;
+    form.removeAttribute("data-asynctask");
+
 
     form.addEventListener("submit", function (ev) {
         ev.preventDefault();
@@ -33,7 +35,8 @@
                 }
                 errEl.textContent = "";
                 form.dataset.blikStashed = input.value;
-                form.submit(); // dopiero teraz właściwe złożenie zamówienia
+                form.setAttribute("data-asynctask", "");
+                form.requestSubmit();
             })
             .catch(function () {
                 document.getElementById("blik-stash-error").textContent =
