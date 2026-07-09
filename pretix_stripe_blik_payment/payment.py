@@ -11,6 +11,7 @@ from pretix.base.models import Order, OrderPayment
 from pretix.plugins.stripe.payment import (
     PaymentException,
     StripeRedirectMethod,
+    reverse,
 )
 
 
@@ -34,8 +35,7 @@ class StripeBlik(StripeRedirectMethod):
     def is_allowed(self, request, total=None):
         return super().is_allowed(request, total) and self.event.currency == "PLN"
 
-    # Na etapie payment_step nic już nie zbieramy – tylko informacja, że kod poda się na końcu
-    def payment_form_render(self, request) -> str:
+    def payment_form_render(self, request, total, order=None) -> str:
         template = get_template(
             "pretixplugins/stripe/checkout_payment_form_simple_noform.html"
         )
@@ -55,23 +55,28 @@ class StripeBlik(StripeRedirectMethod):
     def payment_is_valid_session(self, request):
         return f"payment_stripe_{self.method}_payment_method_id" in request.session
 
-    # To renderuje się na stronie CONFIRM, w tym samym <form> co przycisk "Złóż zamówienie"
-    def checkout_confirm_render(self, request, **kwargs) -> str:
-        template = get_template(
-            "pretix_stripe_blik_payment/confirm_blik_code_field.html"
-        )
-        return template.render({"request": request})
+    # KLUCZOWE: przy tworzeniu zamówienia NIC nie robimy ze Stripe.
+    def execute_payment(self, request, payment: OrderPayment):
+        payment.state = OrderPayment.PAYMENT_STATE_CREATED
+        payment.save()
+        return None  # brak redirectu – user zobaczy zwykłą stronę zamówienia
 
-    def _payment_intent_kwargs(self, request, payment):
-        code = request.POST.get("stripe_blik_code", "")
-        if not re.match(r"^\d{6}$", code):
-            raise PaymentException(_("Please enter a valid 6-digit BLIK code."))
-        return {
-            "payment_method_data": {
-                "type": "blik",
-                "billing_details": {"email": payment.order.email},
-            },
-            "payment_method_options": {
-                "blik": {"code": code},
-            },
-        }
+    def payment_pending_render(self, request, payment: OrderPayment) -> str:
+        template = get_template("pretixplugins/stripe_blik/pending_code_form.html")
+        return template.render(
+            {
+                "request": request,
+                "event": self.event,
+                "payment": payment,
+                "action_url": reverse(
+                    "plugins:pretix_stripe_blik:pay",
+                    kwargs={
+                        "organizer": self.event.organizer.slug,
+                        "event": self.event.slug,
+                        "order": payment.order.code,
+                        "payment": payment.pk,
+                        "hash": payment.order.tagged_secret("plugins:stripe_blik"),
+                    },
+                ),
+            }
+        )
