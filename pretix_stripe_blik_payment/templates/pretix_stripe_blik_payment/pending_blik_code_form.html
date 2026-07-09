@@ -1,15 +1,21 @@
 {% load i18n %}
-<div class="alert alert-info">
-    <p>{% trans "To complete your payment, open your banking app, generate a BLIK code, and enter it below." %}</p>
+{% load bootstrap3 %}
+<div class="form-group stripe-blik-code">
+    <label for="id_{{ field_name }}">{% trans "Kod BLIK" %}</label>
+    <input
+        type="text"
+        name="{{ field_name }}"
+        id="id_{{ field_name }}"
+        class="form-control"
+        inputmode="numeric"
+        pattern="[0-9]{6}"
+        maxlength="6"
+        minlength="6"
+        required
+        autocomplete="off"
+        placeholder="123456"
+    >
+    <p class="help-block">
+        {% trans "Kod wygeneruj w aplikacji swojego banku bezpośrednio przed złożeniem zamówienia." %}
+    </p>
 </div>
-<form method="post" action="{{ action_url }}">
-    {% csrf_token %}
-    <div class="form-group">
-        <label for="stripe_blik_code">{% trans "BLIK code" %}</label>
-        <input type="text" class="form-control" id="stripe_blik_code" name="code"
-               inputmode="numeric" pattern="\d{6}" maxlength="6" autocomplete="off" required
-               placeholder="123456">
-        <p class="help-block">{% trans "The code is valid for 2 minutes." %}</p>
-    </div>
-    <button type="submit" class="btn btn-primary mb-2">{% trans "Pay with BLIK" %}</button>
-</form>

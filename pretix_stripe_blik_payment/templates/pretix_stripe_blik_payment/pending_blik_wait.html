@@ -1,0 +1,17 @@
+{% load i18n %}
+{% load static %}
+<div id="blik-pending" data-status-url="{{ status_url }}" data-retry-url="{{ retry_url }}">
+
+    <div id="blik-waiting" class="text-center">
+        <div class="loading-spinner"></div>
+        <p>{% trans "Otwórz aplikację swojego banku i zaakceptuj płatność BLIK." %}</p>
+        <p class="text-muted">{% trans "To okno odświeży się automatycznie." %}</p>
+    </div>
+
+    <div id="blik-failed" style="display:none;" class="alert alert-danger">
+        <p>{% trans "Płatność nie powiodła się lub czas na akceptację minął." %}</p>
+    </div>
+
+</div>
+
+<script src="{% static 'pretix_stripe_blik_payment/pending_blik.js' %}"></script>

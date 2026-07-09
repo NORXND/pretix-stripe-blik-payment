@@ -1,0 +1,23 @@
+{% load i18n %}
+{% load static %}
+<div id="blik-confirm" class="form-group stripe-blik-code" data-stash-url="{{ stash_url }}">
+    <label for="id_stripe_blik_code">{% trans "Kod BLIK" %}</label>
+    <input
+        type="text"
+        id="id_stripe_blik_code"
+        class="form-control"
+        inputmode="numeric"
+        pattern="[0-9]{6}"
+        maxlength="6"
+        minlength="6"
+        required
+        autocomplete="off"
+        placeholder="123456"
+    >
+    <p class="help-block">
+        {% trans "Kod wygeneruj w aplikacji swojego banku bezpośrednio przed kliknięciem 'Złóż zamówienie'." %}
+    </p>
+    <div id="blik-stash-error" class="text-danger"></div>
+</div>
+
+<script src="{% static 'pretix_stripe_blik_payment/confirm_blik.js' %}"></script>
